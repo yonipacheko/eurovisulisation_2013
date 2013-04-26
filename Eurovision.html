@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+</head>
+<body>
+
+<ul id="thisList">
+
+    <script id="tweets-template" type="text/x-handlebars-template">
+    		{{#each this}}
+    		<li>
+    			<img src="{{thumb}}" alt="{{author}}">
+    			<p><a href="{{url}}">{{tweet}}</a></p>
+    		</li>
+    		{{/each}}
+    </script>
+
+</ul>
+
+</body>
+<script src="http://cloud.github.com/downloads/wycats/handlebars.js/handlebars-1.0.0.beta.6.js"></script>
+<script src="jquery-1.7.1.js" ></script>
+<script>
+    (function(){
+        var self;
+        var Twitter = {
+            // config is obj here!
+            init: function(config){
+
+                this.url = 'http://search.twitter.com/search.json?q=Eurovision&callback=?';
+
+                this.template = config.template;
+                this.container = config.container;
+                this.fetch();
+
+            },
+
+            attachTemplate: function(){
+                console.log(self.tweets);
+            },
+
+            fetch: function(){
+               // console.log(this.url);
+
+                 self = this; // our main obj
+
+                $.getJSON( this.url, function( data){
+
+                    //console.log(data.results);
+                    self.tweets = $.map( data.results, function(tweet){
+
+                        // we want to return an object
+
+                        return{
+                            author: tweet.user_from,
+                            text: tweet.text,
+                            thumb: tweet.profile_image_url,
+                            url: 'http://twitter.com/' + tweet.from_user + '/status/' + tweet.id_str
+                        }
+                    });
+
+                    //console.log(tweets);
+                   //$('#thisList').html(tweets);
+                    self.attachTemplate();
+                });
+            }
+
+        }; // ends Twitter
+
+        // inside init is an obj.
+        Twitter.init({
+            template: $('#tweets-template'),
+            container: $('#thisList')
+
+        });
+
+    }) ();
+
+</script>
+</html>
